@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Version>0.1.0</Version>
+    <PackageVersion>0.1.0</PackageVersion>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Stefan Cullmann</Authors>
+    <Company>DnnFable</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/DnnFable/Dnn.Resx.ResxProvider</PackageProjectUrl>
+    <PackageTags>DNN DotNetNuke fsharp Localisation</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="ProvidedTypes.fs" />
+    <Compile Include="ProviderDsl.fs" />
+    <Compile Include="JsonParser.fs" />
+    <Compile Include="ResxProvider.fs" />
+  </ItemGroup>
+  <Import Project="..\.paket\Paket.Restore.targets" />
+</Project>

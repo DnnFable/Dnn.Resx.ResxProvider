@@ -1,0 +1,4 @@
+source https://www.nuget.org/api/v2
+
+nuget FSharp.Core ~> 4.7.2
+nuget Fable.Core ~> 3.0.0
