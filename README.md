@@ -15,11 +15,11 @@ open Browser.Dom
 type ViewResources = Dnn.Resx.ResxProvider<"/App_LocalResources/View.resx">
 
 //it can be loaded on runtime using DNN.Resx
-Dnn.Resx.loadResources "~desktopmodules/MVC/vendor.namespaces/App_LocalResources/View.resx"
+Dnn.Resx.loadResources "~desktopmodules/vendor/modulename/App_LocalResources/View.resx"
 |> Promise.map ViewResources
 |> Promise.iter
     (fun res ->
-        // During desingn time, the items are available as properties
+        // During design time, the items are available as properties
         console.log res.``Input.Text``)
 ```
 
