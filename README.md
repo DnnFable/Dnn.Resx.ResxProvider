@@ -11,17 +11,40 @@ A F# Type Provider designed for Fable. It provides typed information on DNN's Re
 ```fsharp
 open Browser.Dom
 
-//ViewResources is the typed representation of the resources fpr localization
-type ViewResources = Dnn.Resx.ResxProvider<"/App_LocalResources/View.resx">
+//ViewResources is the typed representation of the resources for localization
+type ViewResources = Dnn.Resx.ResxProvider<"./App_LocalResources/View.resx">
 
-//it can be loaded on runtime using DNN.Resx
+//it can be loaded on runtime using DNN.Resx.
 Dnn.Resx.loadResources "~desktopmodules/vendor/modulename/App_LocalResources/View.resx"
-|> Promise.map ViewResources
 |> Promise.iter
-    (fun res ->
-        // During design time, the items are available as properties
-        console.log res.``Input.Text``)
+    (fun result ->
+        let resources = ViewResources result
+
+        // During design time, the items are already available as properties
+        console.log resources.``Input.Text``)
 ```
+
+### What is happening behind the scene?
+Fable is going to compile the code from above to this javascript:
+
+```javascript
+import { some } from "./.fable/fable-library.3.1.5/Option.js";
+
+(function () {
+    const pr = (() => {
+        const res = "~desktopmodules/vendor/modulename/App_LocalResources/View.resx";
+        return $.get($.ServicesFramework(0).getServiceRoot('dnn.resx') + 'service/get?strategy=0&resource=' + res);
+    })();
+    pr.then(((result) => {
+        console.log(some(result["Input.Text"]));
+    }));
+})();
+
+```
+As you see, it uses DNN's old JQuery based ServiceFramework to query the Dnn.Resx service, which returns a JObject inside a promise.
+
+
+
 
 ## Inspiration
 This type provider was inspired and originally forked from the  [Fable.JsonProvider](https://github.com/fable-compiler/Fable.JsonProvider)

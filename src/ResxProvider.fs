@@ -16,29 +16,15 @@ module Resx =
     [<Emit("""
     (() => {
       const res =$0;
-      return $.get($.ServicesFramework(0).getServiceRoot('dnn.resx')+'service/get?strategy=0&resource='+res).then((data) => {return JSON.stringify(data);});
+      return $.get($.ServicesFramework(0).getServiceRoot('dnn.resx') + 'service/get?strategy=0&resource=' + res);
     })()""" )>]
-    let loadResources (resxUrl: string): JS.Promise<string> = (unbox) obj ()
+    let loadResources (resxUrl: string): JS.Promise<obj> = (unbox) obj ()
 
     [<Emit("JSON.parse($0)")>]
     let jsonParse (json: string) = obj ()
 
     [<Emit("$0[$1]")>]
     let getProp (o: obj) (k: string) = obj ()
-
-    let fetchUrlAsync (url: string) =
-        async {
-            let req = WebRequest.CreateHttp(url)
-
-            req.AutomaticDecompression <-
-                DecompressionMethods.GZip
-                ||| DecompressionMethods.Deflate
-
-            use! resp = req.AsyncGetResponse()
-            use stream = resp.GetResponseStream()
-            use reader = new IO.StreamReader(stream)
-            return reader.ReadToEnd()
-        }
 
     let firstToUpper (s: string) = s.[0..0].ToUpper() + s.[1..]
 
@@ -80,7 +66,8 @@ module Resx =
                 typeName,
                 [ yield! basicMembers |> List.collect (makeMember "")
                   if withCons then
-                      yield Constructor([ "json", String ], (fun args -> <@@ jsonParse %%args.Head @@>)) ]
+                      yield Constructor([ "json", String ], (fun args -> <@@ jsonParse %%args.Head @@>))
+                      yield Constructor([ "obj", Any ], (fun args -> <@@ %%args.Head @@>)) ]
             )
 
         match JsonParser.parse sample with
@@ -119,52 +106,40 @@ module Resx =
                         | [| :? string as arg |] ->
                             let arg = arg.Trim()
 
-                            if Regex.IsMatch(arg, "^https?://") then
-                                async {
-                                    let! res = fetchUrlAsync arg
-
-                                    return
-                                        match parseJson asm ns typeName res with
-                                        | Some t -> t
-                                        | None -> failwithf "Response from URL %s is not a valid JSON: %s" arg res
-                                }
-                                |> Async.RunSynchronously
-                            else
-                                let readfile arg =
-                                    let filepath =
-                                        if Path.IsPathRooted arg then
-                                            arg
-                                        else
-                                            Path.GetFullPath(Path.Combine(config.ResolutionFolder, arg))
-
-                                    File.ReadAllText(filepath, System.Text.Encoding.UTF8)
-
-                                let parseResx text =
-                                    let matches =
-                                        Regex.Matches(text, "<!--(?:.|\n)*?-->|data\s+name=\"(.*?)\"")
-
-                                    seq { for m in matches -> m }
-                                    |> Seq.map (fun m -> m.Groups.[1].Value)
-                                    |> Seq.filter (System.String.IsNullOrWhiteSpace >> not)
-
-                                let content =
-                                    // Check if the string is a JSON literal
-                                    if arg.StartsWith("{") || arg.StartsWith("[") then
+                            let readfile arg =
+                                let filepath =
+                                    if Path.IsPathRooted arg then
                                         arg
-                                    else if arg.EndsWith(".resx") then
-                                        readfile arg
-                                        |> parseResx
-                                        |> Seq.map (fun n -> sprintf "\"%s\":\"\"," n)
-                                        |> Seq.fold (+) ""
-                                        |> sprintf "{%s}"
-
                                     else
-                                        readfile arg
+                                        Path.GetFullPath(Path.Combine(config.ResolutionFolder, arg))
 
+                                File.ReadAllText(filepath, System.Text.Encoding.UTF8)
 
-                                match parseJson asm ns typeName content with
-                                | Some t -> t
-                                | None -> failwithf "Local sample is not a valid JSON: %s" content
+                            let parseResx text =
+                                let matches =
+                                    Regex.Matches(text, "<!--(?:.|\n)*?-->|data\s+name=\"(.*?)\"")
+
+                                seq { for m in matches -> m }
+                                |> Seq.map (fun m -> m.Groups.[1].Value)
+                                |> Seq.filter (System.String.IsNullOrWhiteSpace >> not)
+
+                            let content =
+                                // Check if the string is a JSON literal
+                                if arg.StartsWith("{") || arg.StartsWith("[") then
+                                    arg
+                                else if arg.EndsWith(".resx") then
+                                    readfile arg
+                                    |> parseResx
+                                    |> Seq.map (fun n -> sprintf "\"%s\":\"\"," n)
+                                    |> Seq.fold (+) ""
+                                    |> sprintf "{%s}"
+
+                                else
+                                    readfile arg
+
+                            match parseJson asm ns typeName content with
+                            | Some t -> t
+                            | None -> failwithf "Local sample is not a valid JSON: %s" content
                         | _ -> failwith "unexpected parameter values")
             )
 
