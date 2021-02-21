@@ -43,8 +43,7 @@ import { some } from "./.fable/fable-library.3.1.5/Option.js";
 ```
 As you see, it uses DNN's old JQuery based ServiceFramework to query the Dnn.Resx service, which returns a JObject inside a promise.
 
-
-
+The generated type `ViewResources` is now completly erased. It already did his job during design and compile time. It was its responsibility to support the developer with intellisense. If the resource gets modified and keys were changed, it would even result into compiler errors.
 
 ## Inspiration
 This type provider was inspired and originally forked from the  [Fable.JsonProvider](https://github.com/fable-compiler/Fable.JsonProvider)
