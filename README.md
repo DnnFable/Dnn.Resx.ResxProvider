@@ -1,6 +1,7 @@
 # Dnn.Resx.ResxProvider [![Nuget](https://img.shields.io/nuget/v/Dnn.Resx.ResxProvider?style=flat-square)](https://www.nuget.org/packages/Dnn.Resx.ResxProvider/)
 
-A F# Type Provider designed for Fable. It provides typed information on DNN's Resource Files (.resx) during design time and can be loaded with localized texts on runtime with the help of [Dnn.Resx](https://github.com/DnnFable/Dnn.Resx)
+A F# Type Provider designed for Fable. It provides typed information on DNN's Resource Files (.resx) during design time and can be loaded with localized texts on runtime with the help of 
+[Dnn.Resx](https://github.com/DnnFable/Dnn.Resx)
 
 ## Usage
 * Install [Dnn.Resx](https://github.com/DnnFable/) on your DNN server
