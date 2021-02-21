@@ -4,7 +4,7 @@ A F# Type Provider designed for Fable. It provides typed information on DNN's Re
 [Dnn.Resx](https://github.com/DnnFable/Dnn.Resx)
 
 ## Usage
-* Install [Dnn.Resx](https://github.com/DnnFable/) on your DNN server
+* Install [Dnn.Resx](https://github.com/DnnFable/Dnn.Resx) on your DNN server
 * Install the package `Dnn.Resx.ResxProvider` from NuGet
 * Add a resource file and generate your model
 
